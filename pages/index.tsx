@@ -6,6 +6,8 @@ import Feed from '../components/Feed';
 import Header from '../components/Header';
 import Login from '../components/Login';
 import Sidebar from '../components/Sidebar';
+import Widgets from '../components/Widgets';
+import { db } from '../firebase';
 
 export interface Props {
   userSession: Session | null;
@@ -27,8 +29,8 @@ export default function Home({ userSession }: Props): JSX.Element {
 
       <main className="flex">
         <Sidebar />
-        <Feed/>
-        {/* Widgets */}
+        <Feed />
+        <Widgets />
       </main>
     </div>
   );

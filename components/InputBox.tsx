@@ -10,7 +10,7 @@ import {
   serverTimestamp,
   DocumentReference,
   DocumentData,
-  doc, 
+  doc,
   setDoc
 } from 'firebase/firestore';
 import {
@@ -26,9 +26,7 @@ export default function InputBox(): JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
   const filePickerRef = useRef<HTMLInputElement>(null);
   const [previewImageToPost, setPreviewImageToPost] = useState<string>();
-  const [blogImageToPost, setBlobImageToPost] = useState<
-    Blob | Uint8Array | ArrayBuffer
-  >();
+  const [blogImageToPost, setBlobImageToPost] = useState< Blob | Uint8Array | ArrayBuffer | undefined >();
 
   let url: string;
 
@@ -51,11 +49,11 @@ export default function InputBox(): JSX.Element {
       image: data?.user?.image,
       timestamp: serverTimestamp(),
     })
-      .then((doc: DocumentReference<DocumentData>) => {
+      .then((snapshot: DocumentReference<DocumentData>) => {
         //   to check if got image then upload media to firebase storage by give created doc id
         if (blogImageToPost) {
           // before that we must create getStorage(app)
-          const postRef = ref(storage, `posts/${doc.id}.jpg`);
+          const postRef = ref(storage, `posts/${snapshot.id}.jpg`);
 
           // upload file to storage
           uploadBytes(postRef, blogImageToPost)
@@ -93,9 +91,11 @@ export default function InputBox(): JSX.Element {
               // Handle successful uploads on complete
               // For instance, get the download URL: https://firebasestorage.googleapis.com/...
               // store at the db as part of the post
-              getDownloadURL(ref(storage, 'posts')).then(url => {
-                  const postRef = doc()
-                  setDoc()
+              getDownloadURL(uploadTask.snapshot.ref).then(url => {
+                const postRef = doc(db, 'posts', snapshot.id);
+                setDoc(postRef, {
+                  postImage: url,
+                }, { merge: true });
               });
             }
           );
@@ -104,6 +104,8 @@ export default function InputBox(): JSX.Element {
       .catch((error) => console.log(error.message));
 
     inputRef.current!.value = '';
+    setPreviewImageToPost('');
+    setBlobImageToPost(undefined);
   }
 
   function addImageToPost(e: React.ChangeEvent<HTMLInputElement>) {

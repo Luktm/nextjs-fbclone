@@ -6,5 +6,6 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  //  yarn add tailwind-scrollbar-hide
+  plugins: [require("tailwind-scrollbar-hide")],
 }
